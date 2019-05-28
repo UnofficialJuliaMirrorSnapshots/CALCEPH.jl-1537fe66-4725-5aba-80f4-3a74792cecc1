@@ -1,13 +1,13 @@
 # Tutorial
 
-This tutorial will walk you through the features and functionality of CALCEPH.jl
+This tutorial will walk you through the features and functionality of [CALCEPH.jl](https://github.com/JuliaAstro/CALCEPH.jl)
 
 ## Ephemerides sources
 
 The supported sources of ephemerides are:
-- JPL DExxx binary ephemerides files: https://ssd.jpl.nasa.gov/?planet_eph_export
-- IMCCE INPOP ephemerides files: https://www.imcce.fr/inpop/
-- some NAIF SPICE kernels: https://naif.jpl.nasa.gov/naif/data.html
+- JPL DExxx binary ephemerides files: [https://ssd.jpl.nasa.gov/?planet_eph_export](https://ssd.jpl.nasa.gov/?planet_eph_export)
+- IMCCE INPOP ephemerides files: [https://www.imcce.fr/inpop/](https://www.imcce.fr/inpop/)
+- some NAIF SPICE kernels: [https://naif.jpl.nasa.gov/naif/data.html](https://naif.jpl.nasa.gov/naif/data.html)
 
 Example:
 ```julia
@@ -96,11 +96,11 @@ CALCEPH has the following identification scheme for bodies:
 
 If target is 14, 15, 16 or 17 (nutation, libration, TT-TDB or TCG-TCB), center must be 0.
 
-The more complete NAIF identification number can be used if the value useNaifId is added to the options argument.
+The more complete NAIF identification scheme can be used if the value useNaifId is added to the options argument.
 
 ## NAIF body identification scheme
 
-See https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/naif_ids.html
+See [https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/naif_ids.html](https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/naif_ids.html)
 
 CALCEPH uses this identification scheme only when the value useNaifId is added to the options argument.
 
@@ -124,7 +124,7 @@ naifId also stores the following identifiers:
 - :tcgmtcb (1000000002): the target argument when requesting a value from the difference TCG-TCB time ephemeris.
 
 
-naifId is actually an instance of mutable struct BodyId. The user can also create its own identification scheme for its NAIF kernels:
+naifId is actually an instance of mutable struct BodyId. The user can also create its own identification scheme for its SPICE kernels:
 ```julia
 const MyUniverseIds = CALCEPH.BodyId()
 CALCEPH.add!(MyUniverseIds,:tatooine,1000001)
@@ -139,7 +139,7 @@ You can also load identification data from an external file:
 ```julia
 loadData!(MyUniverseIds, "MyUniverseIds.txt"))
 ```
-See example: https://github.com/JuliaAstro/CALCEPH.jl/blob/master/data/NaifIds.txt
+See example: [https://github.com/JuliaAstro/CALCEPH.jl/blob/master/data/NaifIds.txt](https://github.com/JuliaAstro/CALCEPH.jl/blob/master/data/NaifIds.txt)
 
 Names from the file are converted to lower case and have spaces replaced by underscores before being converted to symbols/interned strings.
 
@@ -165,16 +165,19 @@ Those methods compute the position and its time derivatives of target with respe
   - 1: compute position and velocity
   - 2: compute position, velocity and acceleration
   - 3: compute position, velocity, acceleration and jerk.
+  
+
+When order is not specified, position and velocity are computed.
 
 #### Example:
 Computing position only of Jupiter system barycenter with respect to the Earth Moon center in kilometers at JD=2456293.5 (Ephemeris Time).
 ```julia
- options = useNaifId + unitKM + unitSec
- jd1 = 2456293.0
- jd2 = 0.5
- center = naifId.id[:moon]
- target = naifId.id[:jupiter_barycenter]
- pos = compute(eph2, jd1, jd2, target, center, options,0)
+options = useNaifId + unitKM + unitSec
+jd1 = 2456293.0
+jd2 = 0.5
+center = naifId.id[:moon]
+target = naifId.id[:jupiter_barycenter]
+pos = compute(eph2, jd1, jd2, target, center, options,0)
 ```  
 
 ## Computing orientation:
@@ -198,27 +201,27 @@ Those methods compute the Euler angles of target and their time derivatives.
   - 2: only the angles, the first and second derivatives are computed.
   - 3: the angles, the first, second and third derivatives are computed.
 
-  #### Example:
-  JPL DE405 binary ephemerides contain Chebychev polynomials for the IAU 1980 nutation theory. Interpolating those is much faster than computing the IAU 1980 nutation series.    
-  Computing Earth nutation angles in radians at JD=2456293.5 (Ephemeris Time).
-  ```julia
-   download("ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de405/lnxp1600p2200.405","DE405")
-   eph1 = Ephem("DE405")
-   options = useNaifId + unitRad + unitSec + outputEulerAngles
-   jd1 = 2456293.0
-   jd2 = 0.5
-   target = naifId.id[:earth]
-   angles = orient(eph1, jd1, jd2, target, options,0)
-  ```
-  Note that the returned value is a vector of 3 even though there are only 2 nutation angles. The last value is zero and meaningless.
+#### Example:
+JPL DE405 binary ephemerides contain Chebychev polynomials for the IAU 1980 nutation theory. Interpolating those is much faster than computing the IAU 1980 nutation series.    
+Computing Earth nutation angles in radians at JD=2456293.5 (Ephemeris Time).
+```julia
+download("ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de405/lnxp1600p2200.405","DE405")
+eph1 = Ephem("DE405")
+options = useNaifId + unitRad + unitSec + outputEulerAngles
+jd1 = 2456293.0
+jd2 = 0.5
+target = naifId.id[:earth]
+angles = orient(eph1, jd1, jd2, target, options,0)
+```
+Note that the returned value is a vector of 3 even though there are only 2 nutation angles. The last value is zero and meaningless.
 
 ## Computing angular momentum:
 
 The following methods are available to compute body angular momentum with CALCEPH:
 
 ```julia
-rotrotAngMom(eph,jd1,jd2,target,unit)
-rotrotAngMom(eph,jd1,jd2,target,unit,order)
+rotAngMom(eph,jd1,jd2,target,unit)
+rotAngMom(eph,jd1,jd2,target,unit,order)
 ```
 
 Those methods compute the angular momentum of target and their time derivatives.
@@ -237,25 +240,26 @@ Those methods compute the angular momentum of target and their time derivatives.
 
 The time ephemeris TT-TDB or TCG-TCB at the geocenter can be evaluated with a suitable source.
 
-INPOP and some JPL DE ephemerides includes a numerically integrated time ephemerides for the geocenter which is usually more accurate than the analytical series: Moreover it is much faster to interpolate those ephemerides than to evaluate the analytical series. This is only for the geocenter but a simple correction can also be added for the location of the observer (and its velocity in case the observer is on a highly elliptical orbit).
+INPOP and some JPL DE ephemerides includes a numerically integrated time ephemeris for the geocenter which is usually more accurate than the analytical series: Moreover it is much faster to interpolate those ephemerides than to evaluate the analytical series. This is only for the geocenter but a simple correction can also be added for the location of the observer (and its velocity in case the observer is on a highly elliptical orbit).
 
-The difference bewteen TT and TDB can be obtained from the following files:
-- ftp://ftp.imcce.fr/pub/ephem/planets/inpop17a/inpop17a_TDB_m100_p100_tt.dat
-- ftp://ssd.jpl.nasa.gov/pub/eph/planets/bsp/de432t.bsp
+Files that can be used to obtain the difference between TT and TDB are, e.g.:
+- [ftp://ftp.imcce.fr/pub/ephem/planets/inpop17a/inpop17a_TDB_m100_p100_tt.dat](ftp://ftp.imcce.fr/pub/ephem/planets/inpop17a/inpop17a_TDB_m100_p100_tt.dat)
+- [ftp://ssd.jpl.nasa.gov/pub/eph/planets/bsp/de432t.bsp](ftp://ssd.jpl.nasa.gov/pub/eph/planets/bsp/de432t.bsp)
 
 #### Example:  
-  Computing TT-TDB at geocenter in seconds at JD=2456293.5 (Ephemeris Time).
-  ```julia
-   download("ftp://ftp.imcce.fr/pub/ephem/planets/inpop17a/inpop17a_TDB_m100_p100_tt.dat","INPOP17a")
-   eph1 = Ephem("INPOP17a")
-   options = useNaifId + unitSec
-   jd1 = 2456293.0
-   jd2 = 0.5
-   target = naifId.id[:ttmtdb]
-   center = naifId.id[:timecenter]
-   ttmtdb = compute(eph1, jd1, jd2, target, center, options,0)
-  ```
-  Note that the returned value is a vector of 3 even though there is only one meaningful value. The last 2 values are zero and meaningless.
+Computing TT-TDB at geocenter in seconds at JD=2456293.5 (Ephemeris Time).
+```julia
+download("ftp://ftp.imcce.fr/pub/ephem/planets/inpop17a/inpop17a_TDB_m100_p100_tt.dat","INPOP17a")
+eph1 = Ephem("INPOP17a")
+options = useNaifId + unitSec
+jd1 = 2456293.0
+jd2 = 0.5
+target = naifId.id[:ttmtdb]
+center = naifId.id[:timecenter]
+ttmtdb = compute(eph1, jd1, jd2, target, center, options,0)
+```
+
+Note that the returned value is a vector of 3 even though there is only one meaningful value. The last 2 values are zero and meaningless.
 
 ## In place methods
 
@@ -271,7 +275,7 @@ unsafe_rotAngMom!(result,eph,jd1,jd2,target,options)
 unsafe_rotAngMom!(result,eph,jd1,jd2,target,options,order)
 ```
 
-Those methods do not perform any checks on their inputs. In particular, result must be a contiguous vector of double precion floating point number of dimension at least 6 when order is not specified or at least 3*(order+1) otherwise.
+Those methods do not perform any checks on their inputs. In particular, result must be a contiguous vector of double precision floating point number of dimension at least 6 when order is not specified or at least 3*(order+1) otherwise.
 
 ## Constants
 
@@ -306,9 +310,9 @@ returns the triplet:
 - julian date of first entry in ephemerides context.
 - julian date of last entry in ephemerides context.
 - information about the availability of the quantities over the time span:
-       - 1 if the quantities of all bodies are available for any time between the first and last time.
-       - 2 if the quantities of some bodies are available on discontinuous time intervals between the first and last time.
-       - 3 if the quantities of each body are available on a continuous time interval between the first and last time, but not available for any time between the first and last time.
+  - 1 if the quantities of all bodies are available for any time between the first and last time.
+  - 2 if the quantities of some bodies are available on discontinuous time intervals between the first and last time.
+  - 3 if the quantities of each body are available on a continuous time interval between the first and last time, but not available for any time between the first and last time.
 
 #### Position records
 
