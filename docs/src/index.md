@@ -27,7 +27,7 @@ using CALCEPH
 
 # load a single file in context eph1
 eph1 = Ephem("planets.dat")
-
+# load multiple files in context eph2
 eph2 = Ephem(["planets.dat","jupiter_system.bsp"])
 ```
 
@@ -137,7 +137,7 @@ CALCEPH.add!(MyUniverseIds,:edsb,1000005)
 
 You can also load identification data from an external file:
 ```julia
-loadData!(MyUniverseIds, "MyUniverseIds.txt"))
+CALCEPH.loadData!(MyUniverseIds, "MyUniverseIds.txt")
 ```
 See example: [https://github.com/JuliaAstro/CALCEPH.jl/blob/master/data/NaifIds.txt](https://github.com/JuliaAstro/CALCEPH.jl/blob/master/data/NaifIds.txt)
 
@@ -165,7 +165,7 @@ Those methods compute the position and its time derivatives of target with respe
   - 1: compute position and velocity
   - 2: compute position, velocity and acceleration
   - 3: compute position, velocity, acceleration and jerk.
-  
+
 
 When order is not specified, position and velocity are computed.
 
@@ -207,7 +207,7 @@ Computing Earth nutation angles in radians at JD=2456293.5 (Ephemeris Time).
 ```julia
 download("ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de405/lnxp1600p2200.405","DE405")
 eph1 = Ephem("DE405")
-options = useNaifId + unitRad + unitSec + outputEulerAngles
+options = useNaifId + unitRad + unitSec + outputNutationAngles
 jd1 = 2456293.0
 jd2 = 0.5
 target = naifId.id[:earth]
@@ -220,8 +220,8 @@ Note that the returned value is a vector of 3 even though there are only 2 nutat
 The following methods are available to compute body angular momentum with CALCEPH:
 
 ```julia
-rotAngMom(eph,jd1,jd2,target,unit)
-rotAngMom(eph,jd1,jd2,target,unit,order)
+rotAngMom(eph,jd1,jd2,target,options)
+rotAngMom(eph,jd1,jd2,target,options,order)
 ```
 
 Those methods compute the angular momentum of target and their time derivatives.
@@ -349,10 +349,30 @@ Because, Julia's garbage collector is lazy, you may want to free the memory mana
 
 ```julia
 finalize(eph1)
-eph1 = None
+eph1 = Nothing
 ```
 or after with
 ```julia
-eph1 = None
-gc()
+eph1 = Nothing
+GC.gc()
+```
+## Error handling
+
+By default, the CALCEPH C library prints error messages directly to the standard output but this can be modified.
+
+The Julia wrapper provides the following interface for this purpose:
+```julia
+CALCEPH.setCustomHandler(f)
+```
+where f should be a user function taking a single argument of type String which will contain the CALCEPH error message. f should return Nothing.
+
+To disable CALCEPH error messages printout to the console:
+
+```julia
+CALCEPH.setCustomHandler(s->Nothing)
+```
+
+To get back the default behavior:
+```julia
+CALCEPH.disableCustomHandler()
 ```
